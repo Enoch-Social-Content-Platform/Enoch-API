@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
+import { Kyc } from "./Kyc";
 
 enum userType {
   Admin = "admin",
@@ -18,6 +19,7 @@ enum userType {
   Kycteam = "Kyc",
   individual = "individual",
 }
+
 @Entity("users")
 @Unique(["email"])
 @ObjectType()
@@ -90,6 +92,9 @@ export class User extends BaseEntity {
   @Field(() => String)
   @UpdateDateColumn()
   updatedAt = Date();
+
+  @OneToMany(() => Kyc, (kyc) => kyc.user)
+  kyc: Kyc;
 
   @BeforeInsert()
   async hashPasswordBeforeInsert() {

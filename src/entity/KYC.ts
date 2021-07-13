@@ -3,65 +3,46 @@ import {
   Column,
   BaseEntity,
   PrimaryGeneratedColumn,
-  OneToOne,
-  JoinColumn,
+  ManyToOne,
 } from "typeorm";
 import { Field, ObjectType } from "type-graphql";
 import { User } from "./User";
-@Entity("KYC")
+
+enum IDTYPE {
+  IDCard = "ID_CARD",
+  PASSPORT = "PASSPORT",
+  DRIVING = "DRIVING_LICENCE",
+  SELFIE = "SELFIE",
+  PROOFADDRESS = "PROOF_ADRESSE",
+}
+
+@Entity("kyc")
 @ObjectType()
-export class KYC extends BaseEntity {
+export class Kyc extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") id: string;
 
-  @OneToOne(() => User)
-  @JoinColumn()
-  userId: User;
+  @Field(() => String)
+  @Column({
+    type: "enum",
+    enum: IDTYPE,
+    default: IDTYPE.IDCard,
+    nullable: false,
+  })
+  ID_type: IDTYPE;
+
+  @Field(() => Number)
+  @Column()
+  ID_number: Number;
+
+  @Field(() => Date)
+  @Column()
+  expiration_date: Date;
 
   @Field(() => String)
-  @Column("text")
-  id1_type: String;
+  @Column()
+  img!: string;
 
-  @Field(() => String)
-  @Column("text")
-  id1_number: string;
-
-  @Field(() => String)
-  @Column("text")
-  id1_expiry: string;
-
-  @Field(() => String)
-  @Column("text")
-  id1_frontSide: string;
-
-  @Field(() => String)
-  @Column("text")
-  id1_backSide: string;
-
-  @Field(() => String)
-  @Column("text")
-  id2_type: string;
-
-  @Field(() => String)
-  @Column("text")
-  id2_number: string;
-
-  @Field(() => String)
-  @Column("text")
-  id2_expiry: string;
-
-  @Field(() => String)
-  @Column("text")
-  id2_frontSide: string;
-
-  @Field(() => String)
-  @Column("text")
-  id2_backSide: string;
-
-  @Field(() => String)
-  @Column("text")
-  selfie: string;
-
-  @Field(() => String)
-  @Column("text")
-  addressProof: string;
+  @ManyToOne(() => User, (user) => user.kyc)
+  user: User;
 }
+
