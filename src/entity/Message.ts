@@ -1,68 +1,54 @@
 import {
-    Entity,
-    Column,
-    BaseEntity,
-    PrimaryGeneratedColumn,
-    OneToOne,
-    ManyToOne,
-    JoinColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
-  } from "typeorm";
-  import { Field, ObjectType } from "type-graphql";
-  
-  import { User } from "./User";
-  import { Message } from "./Message";
-  
-  enum TICKETSTATUS {
-    OPEN = "open",
-    IN_PROGRESS = "inprogress",
-    SOLVED = "solved",
-    CLOSED = "closed",
-    PROOFADDRESS = "PROOF_ADRESSE",
-  }
-  
-  @Entity("tickets")
-  @ObjectType()
-  export class Ticket extends BaseEntity {
-    @PrimaryGeneratedColumn("uuid") id: string;
-  
-    @ManyToOne(() => User, (user) => user.tickets, { onDelete: "CASCADE" })
-    @JoinColumn({ name: "user_id" })
-    user: User;
-  
-    @Field(() => String)
-    @Column("text", { nullable: true })
-    category: String;
-  
-    @Field(() => String)
-    @Column("text", { nullable: true })
-    subject: String;
-  
-    @Field(() => String)
-    @Column({
-      type: "enum",
-      enum: TICKETSTATUS,
-      default: TICKETSTATUS.OPEN,
-      nullable: false,
-    })
-    ticket_status: TICKETSTATUS;
-  
-    @ManyToOne(() => User, (user) => user.tickets, { nullable: true })
-    @JoinColumn({ name: "user_id" })
-    paticipants: User[];
-  
-    @OneToOne(() => Message, (message: any) => message.ticket, {
-      onDelete: "CASCADE",
-    })
-    message: Message;
-  
-    @Field(() => String)
-    @CreateDateColumn()
-    createdAt = Date();
-  
-    @Field(() => String)
-    @UpdateDateColumn()
-    updatedAt = Date();
-  }
-  
+  Entity,
+  Column,
+  BaseEntity,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  ManyToOne,
+} from "typeorm";
+import { Field, ObjectType } from "type-graphql";
+
+import { Ticket } from "./Tickets";
+import { User } from "./User";
+
+@Entity("message")
+@ObjectType()
+export class Message extends BaseEntity {
+  @PrimaryGeneratedColumn("uuid") id: string;
+
+  @OneToOne(() => Ticket, (ticket: any) => ticket.message)
+  @JoinColumn({ name: "ticket_id" })
+  ticket: Ticket;
+
+  @ManyToOne(() => User)
+  @JoinColumn()
+  userId: User;
+
+  @OneToMany(() => User, (user) => user.id, { nullable: true })
+  @JoinColumn()
+  taggeduser: User[];
+
+  @Field(() => String)
+  @Column("text")
+  message_text: String;
+
+  @Field(() => String)
+  @Column("text", { nullable: true })
+  attachments: String[];
+
+  @Field(() => String)
+  @Column("text", { nullable: true })
+  quotted_message_id: String[];
+
+  @Field(() => String)
+  @CreateDateColumn()
+  createdAt = Date();
+
+  @Field(() => String)
+  @UpdateDateColumn()
+  updatedAt = Date();
+}
