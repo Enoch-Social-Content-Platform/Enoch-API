@@ -142,6 +142,8 @@ export class PostResolver {
     }
     const postRepository = getRepository(Post);
     try {
+
+
       await postRepository.save(post);
     } catch (e) {
       console.log(e);
